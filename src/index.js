@@ -1,70 +1,100 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const baseUrl = "http://localhost:3000/characters";
     const characterBar = document.getElementById("character-bar");
-    const characterName = document.getElementById("name");
-    const characterImage = document.getElementById("image");
-    const characterVotes = document.getElementById("vote-count");
-    const voteForm = document.getElementById("votes-form");
+    const detailedInfo = document.getElementById("detailed-info");
+    const nameDisplay = document.getElementById("name");
+    const imageDisplay = document.getElementById("image");
+    const voteCount = document.getElementById("vote-count");
+    const votesForm = document.getElementById("votes-form");
+    const votesInput = document.getElementById("votes");
     const resetButton = document.getElementById("reset-btn");
-    const voteInput = document.getElementById("votes");
+    const characterForm = document.getElementById("character-form");
+    const newNameInput = document.getElementById("name");
+    const newImageInput = document.getElementById("image-url");
 
     let currentCharacter = null;
 
-    // Fetch and display 
+    // Fetch characters and display in character bar
     function fetchCharacters() {
-        fetch("http://localhost:3000/characters")
+        fetch(baseUrl)
             .then(response => response.json())
-            .then(data => {
-                console.log("Characters fetched:", data); 
+            .then(characters => {
                 characterBar.innerHTML = "";
-                data.forEach(character => createCharacterSpan(character));
-            })
-            .catch(error => console.error("Error fetching characters:", error));
+                characters.forEach(character => {
+                    displayCharacterInBar(character);
+                });
+            });
     }
 
-    // Create a span 
-    function createCharacterSpan(character) {
+    function displayCharacterInBar(character) {
         const span = document.createElement("span");
         span.textContent = character.name;
-        span.classList.add("character");
-
-        span.addEventListener("click", () => {
-            displayCharacter(character);
-        });
-
+        span.addEventListener("click", () => displayCharacterDetails(character));
         characterBar.appendChild(span);
     }
 
-    // Display character details 
-    function displayCharacter(character) {
+    function displayCharacterDetails(character) {
         currentCharacter = character;
-        characterName.textContent = character.name;
-        characterImage.src = character.image;
-        characterImage.alt = character.name;
-        characterVotes.textContent = character.votes;
+        nameDisplay.textContent = character.name;
+        imageDisplay.src = character.image;
+        imageDisplay.alt = character.name;
+        voteCount.textContent = character.votes;
     }
 
-    //  vote submission
-    voteForm.addEventListener("submit", (event) => {
+    // votes  submission
+    votesForm.addEventListener("submit", (event) => {
         event.preventDefault();
-        const voteInput = document.getElementById("votes");
-        const newVotes = parseInt(voteInput.value, 10);
-
-        if (!isNaN(newVotes) && currentCharacter) {
-            currentCharacter.votes += newVotes;
-            characterVotes.textContent = currentCharacter.votes;
+        const votesToAdd = parseInt(votesInput.value) || 0;
+        if (currentCharacter) {
+            const newVotes = currentCharacter.votes + votesToAdd;
+            updateVotes(currentCharacter.id, newVotes);
         }
-
-        voteInput.value = ""; 
+        votesForm.reset();
     });
 
-    //  resetting votes
+    function updateVotes(characterId, newVotes) {
+        fetch(`${baseUrl}/${characterId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ votes: newVotes })
+        })
+            .then(response => response.json())
+            .then(updatedCharacter => {
+                currentCharacter.votes = updatedCharacter.votes;
+                voteCount.textContent = updatedCharacter.votes;
+            });
+    }
+
+    //  reset button
     resetButton.addEventListener("click", () => {
         if (currentCharacter) {
-            currentCharacter.votes = 0;
-            characterVotes.textContent = currentCharacter.votes;
+            updateVotes(currentCharacter.id, 0);
         }
     });
 
-    // Fetch characters on page load
+    // new character submission
+    characterForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const newCharacter = {
+            name: newNameInput.value,
+            image: newImageInput.value,
+            votes: 0
+        };
+
+        fetch(baseUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newCharacter)
+        })
+            .then(response => response.json())
+            .then(savedCharacter => {
+                displayCharacterInBar(savedCharacter);
+                displayCharacterDetails(savedCharacter);
+            });
+
+        characterForm.reset();
+    });
+
+    // fetch
     fetchCharacters();
 });
