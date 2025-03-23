@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const votesInput = document.getElementById("votes");
     const resetButton = document.getElementById("reset-btn");
     const characterForm = document.getElementById("character-form");
-    const newNameInput = document.getElementById("name");
+    const newNameInput = document.getElementById("new-name");
     const newImageInput = document.getElementById("image-url");
 
     let currentCharacter = null;
