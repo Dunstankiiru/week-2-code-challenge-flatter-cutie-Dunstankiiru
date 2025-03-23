@@ -1,35 +1,31 @@
-// Your code here
 document.addEventListener("DOMContentLoaded", () => {
     const characterBar = document.getElementById("character-bar");
-    const characterName =  document.getElementById("name");
+    const characterName = document.getElementById("name");
     const characterImage = document.getElementById("image");
     const characterVotes = document.getElementById("vote-count");
     const voteForm = document.getElementById("votes-form");
     const resetButton = document.getElementById("reset-btn");
-    const newCharacterForm = document.getElementById("character-form");
+    const voteInput = document.getElementById("votes");
 
-    let  currentCharacter = null;
+    let currentCharacter = null;
 
-    // Fetch and display in character bar
+    // Fetch and display 
     function fetchCharacters() {
         fetch("http://localhost:3000/characters")
             .then(response => response.json())
             .then(data => {
+                console.log("Characters fetched:", data); 
                 characterBar.innerHTML = "";
                 data.forEach(character => createCharacterSpan(character));
             })
             .catch(error => console.error("Error fetching characters:", error));
     }
 
-
-    //span
-
+    // Create a span 
     function createCharacterSpan(character) {
         const span = document.createElement("span");
         span.textContent = character.name;
         span.classList.add("character");
-
-        //event listener
 
         span.addEventListener("click", () => {
             displayCharacter(character);
@@ -38,17 +34,16 @@ document.addEventListener("DOMContentLoaded", () => {
         characterBar.appendChild(span);
     }
 
-    //Display character details
-
+    // Display character details 
     function displayCharacter(character) {
         currentCharacter = character;
         characterName.textContent = character.name;
         characterImage.src = character.image;
         characterImage.alt = character.name;
         characterVotes.textContent = character.votes;
-    
     }
-    // Handle vote submission
+
+    //  vote submission
     voteForm.addEventListener("submit", (event) => {
         event.preventDefault();
         const voteInput = document.getElementById("votes");
@@ -59,14 +54,17 @@ document.addEventListener("DOMContentLoaded", () => {
             characterVotes.textContent = currentCharacter.votes;
         }
 
-        voteInput.value = ""; // Clear input field
+        voteInput.value = ""; 
     });
 
-    // Handle resetting votes
+    //  resetting votes
     resetButton.addEventListener("click", () => {
         if (currentCharacter) {
             currentCharacter.votes = 0;
             characterVotes.textContent = currentCharacter.votes;
         }
-})
-})
+    });
+
+    // Fetch characters on page load
+    fetchCharacters();
+});
