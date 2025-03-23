@@ -21,4 +21,31 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .catch(error => console.error("Error fetching characters:", error));
     }
+
+
+    //span
+
+    function createCharacterSpan(character) {\
+        const span = document.createElement("span");
+        span.textContent = character.name;
+        span.classList.add("character");
+
+        //event listener
+
+        span.addEventListener("click", () => {
+            displayCharacter(character);
+        });
+
+        characterBar.appendChild(span);
+    }
+
+    //Display character details
+
+    function displayCharacter(character) {
+        currentCharacter = character;
+        characterName.textContent = character.name;
+        characterImage.src = character.image;
+        characterImage.alt = character.name;
+        characterVotes.textContent = character.votes;
+    }
 })  
