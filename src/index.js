@@ -1,7 +1,6 @@
 // Your code here
 document.addEventListener("DOMContentLoaded", () => {
     const characterBar = document.getElementById("character-bar");
-    const detailedInfo = document.getElementById("detailed-info");
     const characterName =  document.getElementById("name");
     const characterImage = document.getElementById("image");
     const characterVotes = document.getElementById("vote-count");
@@ -25,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //span
 
-    function createCharacterSpan(character) {\
+    function createCharacterSpan(character) {
         const span = document.createElement("span");
         span.textContent = character.name;
         span.classList.add("character");
@@ -47,5 +46,27 @@ document.addEventListener("DOMContentLoaded", () => {
         characterImage.src = character.image;
         characterImage.alt = character.name;
         characterVotes.textContent = character.votes;
+    
     }
-})  
+    // Handle vote submission
+    voteForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const voteInput = document.getElementById("votes");
+        const newVotes = parseInt(voteInput.value, 10);
+
+        if (!isNaN(newVotes) && currentCharacter) {
+            currentCharacter.votes += newVotes;
+            characterVotes.textContent = currentCharacter.votes;
+        }
+
+        voteInput.value = ""; // Clear input field
+    });
+
+    // Handle resetting votes
+    resetButton.addEventListener("click", () => {
+        if (currentCharacter) {
+            currentCharacter.votes = 0;
+            characterVotes.textContent = currentCharacter.votes;
+        }
+})
+})
